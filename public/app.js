@@ -616,10 +616,6 @@ function DetailPanel({data,onClose,openDetail}){
       {e.business_logic&&<div className="dsection"><h4>Business Logic</h4>
         <p style={{color:'var(--accent-bright)',fontStyle:'italic',background:'rgba(99,102,241,0.06)',
           padding:10,borderRadius:8,border:'1px solid var(--border)',fontSize:12}}>{e.business_logic}</p></div>}
-      {e.application_name&&<div className="dsection"><h4>Application</h4>
-        <p style={{display:'flex',alignItems:'center',gap:6}}>
-          <svg width="14" height="14" viewBox="0 0 24 24"><path d={ICONS.app} fill={COLORS.app}/></svg>
-          {e.application_name}</p></div>}
       {data.connected&&data.connected.length>0&&<div className="dsection">
         <h4>Connected ({data.connected.length})</h4>
         <ul className="dlist">
@@ -648,7 +644,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
 
   const openCreate=(type)=>{
     if(type==='applications')setForm({name:'',description:''});
-    else if(type==='programs')setForm({name:'',description:'',business_logic:'',application_id:'',read_tables:[],write_tables:[]});
+    else if(type==='programs')setForm({name:'',description:'',business_logic:'',application_ids:[],read_tables:[],write_tables:[]});
     else if(type==='tables')setForm({name:'',description:'',application_id:''});
     else setForm({name:'',description:'',application_ids:[],program_ids:[]});
     setModal({action:'create',type});
@@ -656,7 +652,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
   const openEdit=(type,item)=>{
     if(type==='applications')setForm({id:item.id,name:item.name,description:item.description});
     else if(type==='programs')setForm({id:item.id,name:item.name,description:item.description,business_logic:item.business_logic,
-      application_id:item.application_id||'',read_tables:(item.read_tables||[]).map(t=>t.id),write_tables:(item.write_tables||[]).map(t=>t.id)});
+      application_ids:(item.applications||[]).map(a=>a.id),read_tables:(item.read_tables||[]).map(t=>t.id),write_tables:(item.write_tables||[]).map(t=>t.id)});
     else if(type==='tables')setForm({id:item.id,name:item.name,description:item.description,application_id:item.application_id||''});
     else setForm({id:item.id,name:item.name,description:item.description,
       application_ids:(item.applications||[]).map(a=>a.id),program_ids:(item.programs||[]).map(p=>p.id)});
@@ -737,7 +733,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
           <div className="fg"><label>Description</label><textarea value={form.description||''} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Business description…"/></div>
           {modal.type==='programs'&&<>
             <div className="fg"><label>Business Logic</label><textarea value={form.business_logic||''} onChange={e=>setForm({...form,business_logic:e.target.value})} placeholder="Explain in plain language…"/></div>
-            <div className="fg"><label>Application</label><select value={form.application_id||''} onChange={e=>setForm({...form,application_id:e.target.value})}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
+            <div className="fg"><label>Applications</label><div className="check-list">{apps.map(a=><label key={a.id} className="check-item"><input type="checkbox" checked={(form.application_ids||[]).includes(a.id)} onChange={()=>toggleCheck('application_ids',a.id)}/><span>{a.name}</span></label>)}{apps.length===0&&<span className="check-empty">No applications available</span>}</div></div>
             <div className="fg"><label>Reads from</label><div className="check-list">{tables.map(t=><label key={t.id} className="check-item"><input type="checkbox" checked={(form.read_tables||[]).includes(t.id)} onChange={()=>toggleCheck('read_tables',t.id)}/><span>{t.name}</span></label>)}{tables.length===0&&<span className="check-empty">No tables available</span>}</div></div>
             <div className="fg"><label>Writes to</label><div className="check-list">{tables.map(t=><label key={t.id} className="check-item"><input type="checkbox" checked={(form.write_tables||[]).includes(t.id)} onChange={()=>toggleCheck('write_tables',t.id)}/><span>{t.name}</span></label>)}{tables.length===0&&<span className="check-empty">No tables available</span>}</div></div>
           </>}
