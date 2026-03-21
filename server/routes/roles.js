@@ -39,8 +39,8 @@ router.post('/', (req, res) => {
     const rid = result.lastInsertRowid;
     const insApp = db.prepare('INSERT OR IGNORE INTO role_application_links (role_id, application_id) VALUES (?, ?)');
     const insProg = db.prepare('INSERT OR IGNORE INTO role_program_links (role_id, program_id) VALUES (?, ?)');
-    if (application_ids) for (const aid of application_ids) insApp.run(rid, aid);
-    if (program_ids) for (const pid of program_ids) insProg.run(rid, pid);
+    if (application_ids) for (const aid of application_ids) { if (aid) insApp.run(rid, aid); }
+    if (program_ids) for (const pid of program_ids) { if (pid) insProg.run(rid, pid); }
     res.status(201).json({ id: rid, name });
   } catch (e) {
     res.status(409).json({ error: 'Role already exists' });
@@ -54,8 +54,8 @@ router.put('/:id', (req, res) => {
   db.prepare('DELETE FROM role_program_links WHERE role_id=?').run(req.params.id);
   const insApp = db.prepare('INSERT OR IGNORE INTO role_application_links (role_id, application_id) VALUES (?, ?)');
   const insProg = db.prepare('INSERT OR IGNORE INTO role_program_links (role_id, program_id) VALUES (?, ?)');
-  if (application_ids) for (const aid of application_ids) insApp.run(req.params.id, aid);
-  if (program_ids) for (const pid of program_ids) insProg.run(req.params.id, pid);
+  if (application_ids) for (const aid of application_ids) { if (aid) insApp.run(req.params.id, aid); }
+  if (program_ids) for (const pid of program_ids) { if (pid) insProg.run(req.params.id, pid); }
   res.json({ id: Number(req.params.id), name });
 });
 

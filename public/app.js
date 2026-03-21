@@ -719,8 +719,8 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
           </>}
           {modal.type==='tables'&&<div className="fg"><label>Application</label><select value={form.application_id||''} onChange={e=>setForm({...form,application_id:e.target.value})}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>}
           {modal.type==='roles'&&<>
-            <div className="fg"><label>Uses Applications</label><select multiple value={(form.application_ids||[]).map(String)} onChange={e=>multiSel(e,'application_ids')}>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
-            <div className="fg"><label>Uses Programs</label><select multiple value={(form.program_ids||[]).map(String)} onChange={e=>multiSel(e,'program_ids')}>{programs.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
+            <div className="fg"><label>Uses Applications</label><select multiple value={(form.application_ids||[]).map(String)} onChange={e=>multiSel(e,'application_ids')}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
+            <div className="fg"><label>Uses Programs</label><select multiple value={(form.program_ids||[]).map(String)} onChange={e=>multiSel(e,'program_ids')}><option value="">None</option>{programs.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
           </>}
           <div className="modal-actions"><button className="btn btn-ghost" onClick={()=>setModal(null)}>Cancel</button><button className="btn btn-accent" onClick={save}>Save</button></div>
         </div>
