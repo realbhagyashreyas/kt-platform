@@ -714,8 +714,8 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
           {modal.type==='programs'&&<>
             <div className="fg"><label>Business Logic</label><textarea value={form.business_logic||''} onChange={e=>setForm({...form,business_logic:e.target.value})} placeholder="Explain in plain language…"/></div>
             <div className="fg"><label>Application</label><select value={form.application_id||''} onChange={e=>setForm({...form,application_id:e.target.value})}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
-            <div className="fg"><label>Reads from</label><select multiple value={(form.read_tables||[]).map(String)} onChange={e=>multiSel(e,'read_tables')}>{tables.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
-            <div className="fg"><label>Writes to</label><select multiple value={(form.write_tables||[]).map(String)} onChange={e=>multiSel(e,'write_tables')}>{tables.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
+            <div className="fg"><label>Reads from</label><select multiple value={(form.read_tables||[]).map(String)} onChange={e=>multiSel(e,'read_tables')}><option value="">None</option>{tables.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
+            <div className="fg"><label>Writes to</label><select multiple value={(form.write_tables||[]).map(String)} onChange={e=>multiSel(e,'write_tables')}><option value="">None</option>{tables.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
           </>}
           {modal.type==='tables'&&<div className="fg"><label>Application</label><select value={form.application_id||''} onChange={e=>setForm({...form,application_id:e.target.value})}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>}
           {modal.type==='roles'&&<>
