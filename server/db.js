@@ -44,6 +44,12 @@ db.exec(`
     PRIMARY KEY(program_id, application_id)
   );
 
+  CREATE TABLE IF NOT EXISTS program_program_links (
+    source_program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+    target_program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+    PRIMARY KEY(source_program_id, target_program_id)
+  );
+
   CREATE TABLE IF NOT EXISTS business_roles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,

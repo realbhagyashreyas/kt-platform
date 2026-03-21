@@ -11,6 +11,7 @@ router.get('/', (req, res) => {
   const raLinks = db.prepare('SELECT role_id, application_id FROM role_application_links').all();
   const rpLinks = db.prepare('SELECT role_id, program_id FROM role_program_links').all();
   const paLinks = db.prepare('SELECT program_id, application_id FROM program_application_links').all();
+  const ppLinks = db.prepare('SELECT source_program_id, target_program_id FROM program_program_links').all();
 
   const nodes = [];
   const edges = [];
@@ -28,6 +29,7 @@ router.get('/', (req, res) => {
   for (const l of raLinks) edges.push({ source: `role-${l.role_id}`, target: `app-${l.application_id}`, label: 'USES' });
   for (const l of rpLinks) edges.push({ source: `role-${l.role_id}`, target: `prog-${l.program_id}`, label: 'USES' });
   for (const l of paLinks) edges.push({ source: `prog-${l.program_id}`, target: `app-${l.application_id}`, label: 'BELONGS TO' });
+  for (const l of ppLinks) edges.push({ source: `prog-${l.source_program_id}`, target: `prog-${l.target_program_id}`, label: 'CALLS' });
   for (const l of ptLinks) {
     if (l.direction === 'READ') edges.push({ source: `prog-${l.program_id}`, target: `table-${l.table_id}`, label: 'READS' });
     else edges.push({ source: `prog-${l.program_id}`, target: `table-${l.table_id}`, label: 'WRITES' });
@@ -83,7 +85,11 @@ router.get('/explore/:type/:id', (req, res) => {
       FROM db2_tables t JOIN program_table_links ptl ON t.id = ptl.table_id WHERE ptl.program_id = ? AND ptl.direction = 'WRITE'`).all(id);
     const roles = db.prepare(`SELECT br.id, br.name, br.description, 'role' as type, 'USED BY' as relation
       FROM business_roles br JOIN role_program_links rpl ON br.id = rpl.role_id WHERE rpl.program_id = ?`).all(id);
-    result.connected = [...progApps, ...reads, ...writes, ...roles];
+    const linkedProgs = db.prepare(`SELECT p2.id, p2.name, p2.description, 'program' as type, 'CALLS' as relation
+      FROM programs p2 JOIN program_program_links ppl ON p2.id = ppl.target_program_id WHERE ppl.source_program_id = ?`).all(id);
+    const calledBy = db.prepare(`SELECT p2.id, p2.name, p2.description, 'program' as type, 'CALLED BY' as relation
+      FROM programs p2 JOIN program_program_links ppl ON p2.id = ppl.source_program_id WHERE ppl.target_program_id = ?`).all(id);
+    result.connected = [...progApps, ...reads, ...writes, ...roles, ...linkedProgs, ...calledBy];
   } else if (type === 'table') {
     result.entity = db.prepare("SELECT t.*, a.name as application_name, 'table' as type FROM db2_tables t LEFT JOIN applications a ON t.application_id = a.id WHERE t.id = ?").get(id);
     const readers = db.prepare(`SELECT p.id, p.name, p.description, 'program' as type, 'READ BY' as relation
