@@ -23,22 +23,13 @@ insTbl.run('MAINT_DEFECTS','Defect reports logged by crew and engineers with sev
 insTbl.run('REVENUE_JOURNAL','Financial journal entries for revenue recognition and interline settlement.',4);
 
 // Programs
-const insProg = db.prepare(`INSERT OR IGNORE INTO programs (name,description,business_logic) VALUES (?,?,?)`);
-insProg.run('CRWASN01','Crew assignment program','Reads the flight schedule and crew roster to automatically assign qualified crew members to flights based on their qualifications, base location, and duty time remaining.');
-insProg.run('FLTPLN01','Flight plan generator','Takes route master data and aircraft status to generate optimized flight plans with fuel calculations, alternate airports, and weather considerations.');
-insProg.run('DUTYCK01','Duty time compliance checker','Scans duty logs against regulatory limits to flag any crew members approaching maximum flight time or minimum rest violations.');
-insProg.run('MNTSCH01','Maintenance scheduler','Reads aircraft status and defect reports to schedule maintenance tasks, ensuring aircraft remain airworthy and compliant with maintenance programs.');
-insProg.run('TKTREV01','Ticket revenue processor','Processes ticket sales transactions, applies fare rules, calculates taxes, and posts revenue journal entries for financial reporting.');
-insProg.run('DEFLOG01','Defect logging program','Allows engineers and crew to log aircraft defects with severity classification. Updates aircraft status if defect affects serviceability.');
-
-// Program-Application links
-const insPA = db.prepare(`INSERT OR IGNORE INTO program_application_links (program_id,application_id) VALUES (?,?)`);
-insPA.run(1,1); // CRWASN01 -> Crew Management
-insPA.run(2,2); // FLTPLN01 -> Flight Planning
-insPA.run(3,1); // DUTYCK01 -> Crew Management
-insPA.run(4,3); // MNTSCH01 -> Maintenance Control
-insPA.run(5,4); // TKTREV01 -> Revenue Accounting
-insPA.run(6,3); // DEFLOG01 -> Maintenance Control
+const insProg = db.prepare(`INSERT OR IGNORE INTO programs (name,description,business_logic,application_id) VALUES (?,?,?,?)`);
+insProg.run('CRWASN01','Crew assignment program','Reads the flight schedule and crew roster to automatically assign qualified crew members to flights based on their qualifications, base location, and duty time remaining.',1);
+insProg.run('FLTPLN01','Flight plan generator','Takes route master data and aircraft status to generate optimized flight plans with fuel calculations, alternate airports, and weather considerations.',2);
+insProg.run('DUTYCK01','Duty time compliance checker','Scans duty logs against regulatory limits to flag any crew members approaching maximum flight time or minimum rest violations.',1);
+insProg.run('MNTSCH01','Maintenance scheduler','Reads aircraft status and defect reports to schedule maintenance tasks, ensuring aircraft remain airworthy and compliant with maintenance programs.',3);
+insProg.run('TKTREV01','Ticket revenue processor','Processes ticket sales transactions, applies fare rules, calculates taxes, and posts revenue journal entries for financial reporting.',4);
+insProg.run('DEFLOG01','Defect logging program','Allows engineers and crew to log aircraft defects with severity classification. Updates aircraft status if defect affects serviceability.',3);
 
 // Program-Table links
 const insPT = db.prepare(`INSERT OR IGNORE INTO program_table_links (program_id,table_id,direction) VALUES (?,?,?)`);

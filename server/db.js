@@ -38,12 +38,6 @@ db.exec(`
     UNIQUE(program_id, table_id, direction)
   );
 
-  CREATE TABLE IF NOT EXISTS program_application_links (
-    program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
-    application_id INTEGER NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-    PRIMARY KEY(program_id, application_id)
-  );
-
   CREATE TABLE IF NOT EXISTS business_roles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
