@@ -654,7 +654,10 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
     const endpoint=type==='applications'?'/applications':type==='programs'?'/programs':type==='tables'?'/tables':'/roles';
     await api(`${endpoint}/${id}`,{method:'DELETE'});reload();
   };
-  const multiSel=(e,field)=>setForm({...form,[field]:Array.from(e.target.selectedOptions,o=>o.value).filter(v=>v!=='').map(Number)});
+  const toggleCheck=(field,id)=>{
+    const arr=form[field]||[];
+    setForm({...form,[field]:arr.includes(id)?arr.filter(x=>x!==id):[...arr,id]});
+  };
   const entities=tab==='applications'?apps:tab==='programs'?programs:tab==='tables'?tables:roles;
   const typeKey=tab==='applications'?'app':tab==='programs'?'program':tab==='tables'?'table':'role';
 
@@ -714,13 +717,13 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
           {modal.type==='programs'&&<>
             <div className="fg"><label>Business Logic</label><textarea value={form.business_logic||''} onChange={e=>setForm({...form,business_logic:e.target.value})} placeholder="Explain in plain language…"/></div>
             <div className="fg"><label>Application</label><select value={form.application_id||''} onChange={e=>setForm({...form,application_id:e.target.value})}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
-            <div className="fg"><label>Reads from</label><select multiple value={(form.read_tables||[]).map(String)} onChange={e=>multiSel(e,'read_tables')}><option value="">None</option>{tables.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
-            <div className="fg"><label>Writes to</label><select multiple value={(form.write_tables||[]).map(String)} onChange={e=>multiSel(e,'write_tables')}><option value="">None</option>{tables.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
+            <div className="fg"><label>Reads from</label><div className="check-list">{tables.map(t=><label key={t.id} className="check-item"><input type="checkbox" checked={(form.read_tables||[]).includes(t.id)} onChange={()=>toggleCheck('read_tables',t.id)}/><span>{t.name}</span></label>)}{tables.length===0&&<span className="check-empty">No tables available</span>}</div></div>
+            <div className="fg"><label>Writes to</label><div className="check-list">{tables.map(t=><label key={t.id} className="check-item"><input type="checkbox" checked={(form.write_tables||[]).includes(t.id)} onChange={()=>toggleCheck('write_tables',t.id)}/><span>{t.name}</span></label>)}{tables.length===0&&<span className="check-empty">No tables available</span>}</div></div>
           </>}
           {modal.type==='tables'&&<div className="fg"><label>Application</label><select value={form.application_id||''} onChange={e=>setForm({...form,application_id:e.target.value})}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>}
           {modal.type==='roles'&&<>
-            <div className="fg"><label>Uses Applications</label><select multiple value={(form.application_ids||[]).map(String)} onChange={e=>multiSel(e,'application_ids')}><option value="">None</option>{apps.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
-            <div className="fg"><label>Uses Programs</label><select multiple value={(form.program_ids||[]).map(String)} onChange={e=>multiSel(e,'program_ids')}><option value="">None</option>{programs.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
+            <div className="fg"><label>Uses Applications</label><div className="check-list">{apps.map(a=><label key={a.id} className="check-item"><input type="checkbox" checked={(form.application_ids||[]).includes(a.id)} onChange={()=>toggleCheck('application_ids',a.id)}/><span>{a.name}</span></label>)}{apps.length===0&&<span className="check-empty">No applications available</span>}</div></div>
+            <div className="fg"><label>Uses Programs</label><div className="check-list">{programs.map(p=><label key={p.id} className="check-item"><input type="checkbox" checked={(form.program_ids||[]).includes(p.id)} onChange={()=>toggleCheck('program_ids',p.id)}/><span>{p.name}</span></label>)}{programs.length===0&&<span className="check-empty">No programs available</span>}</div></div>
           </>}
           <div className="modal-actions"><button className="btn btn-ghost" onClick={()=>setModal(null)}>Cancel</button><button className="btn btn-accent" onClick={save}>Save</button></div>
         </div>

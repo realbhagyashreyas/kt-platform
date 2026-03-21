@@ -250,6 +250,16 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .modal-box h2{font-size:17px;font-weight:700;margin-bottom:18px;color:var(--text)}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
 
+/* ── Checkbox list for multi-select ── */
+.check-list{max-height:140px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;
+  background:rgba(11,17,32,0.6);padding:6px}
+.check-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;
+  cursor:pointer;font-size:13px;color:var(--text-secondary);transition:background .15s}
+.check-item:hover{background:rgba(99,102,241,0.08)}
+.check-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.check-item span{flex:1}
+.check-empty{display:block;padding:10px;font-size:12px;color:var(--dim);text-align:center}
+
 /* ── Misc ── */
 .fade-in{animation:fadeIn .5s cubic-bezier(0.4,0,0.2,1)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
