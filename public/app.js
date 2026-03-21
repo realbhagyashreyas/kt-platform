@@ -654,7 +654,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
     const endpoint=type==='applications'?'/applications':type==='programs'?'/programs':type==='tables'?'/tables':'/roles';
     await api(`${endpoint}/${id}`,{method:'DELETE'});reload();
   };
-  const multiSel=(e,field)=>setForm({...form,[field]:Array.from(e.target.selectedOptions,o=>Number(o.value))});
+  const multiSel=(e,field)=>setForm({...form,[field]:Array.from(e.target.selectedOptions,o=>o.value).filter(v=>v!=='').map(Number)});
   const entities=tab==='applications'?apps:tab==='programs'?programs:tab==='tables'?tables:roles;
   const typeKey=tab==='applications'?'app':tab==='programs'?'program':tab==='tables'?'table':'role';
 

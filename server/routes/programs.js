@@ -52,8 +52,8 @@ router.post('/', (req, res) => {
     ).run(name, description || '', business_logic || '', application_id || null);
     const pid = result.lastInsertRowid;
     const ins = db.prepare('INSERT OR IGNORE INTO program_table_links (program_id, table_id, direction) VALUES (?, ?, ?)');
-    if (read_tables) for (const tid of read_tables) ins.run(pid, tid, 'READ');
-    if (write_tables) for (const tid of write_tables) ins.run(pid, tid, 'WRITE');
+    if (read_tables) for (const tid of read_tables) { if (tid) ins.run(pid, tid, 'READ'); }
+    if (write_tables) for (const tid of write_tables) { if (tid) ins.run(pid, tid, 'WRITE'); }
     res.status(201).json({ id: pid, name });
   } catch (e) {
     res.status(409).json({ error: 'Program already exists' });
@@ -66,8 +66,8 @@ router.put('/:id', (req, res) => {
     .run(name, description, business_logic, application_id || null, req.params.id);
   db.prepare('DELETE FROM program_table_links WHERE program_id = ?').run(req.params.id);
   const ins = db.prepare('INSERT OR IGNORE INTO program_table_links (program_id, table_id, direction) VALUES (?, ?, ?)');
-  if (read_tables) for (const tid of read_tables) ins.run(req.params.id, tid, 'READ');
-  if (write_tables) for (const tid of write_tables) ins.run(req.params.id, tid, 'WRITE');
+  if (read_tables) for (const tid of read_tables) { if (tid) ins.run(req.params.id, tid, 'READ'); }
+  if (write_tables) for (const tid of write_tables) { if (tid) ins.run(req.params.id, tid, 'WRITE'); }
   res.json({ id: Number(req.params.id), name });
 });
 
