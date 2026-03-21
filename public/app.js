@@ -260,6 +260,26 @@ function GraphApp({user,onLogout}){
     return()=>el.removeEventListener('wheel',handleWheel);
   },[handleWheel]);
 
+  // Touch support for mobile panning
+  const touchRef=useRef(null);
+  const handleTouchStart=useCallback(e=>{
+    if(e.touches.length===1){
+      const t=e.touches[0];
+      touchRef.current={sx:t.clientX,sy:t.clientY,tx:transform.x,ty:transform.y};
+    }
+  },[transform]);
+  const handleTouchMove=useCallback(e=>{
+    if(e.touches.length===1&&touchRef.current){
+      e.preventDefault();
+      const t=e.touches[0];
+      setTransform(prev=>({...prev,
+        x:touchRef.current.tx+t.clientX-touchRef.current.sx,
+        y:touchRef.current.ty+t.clientY-touchRef.current.sy
+      }));
+    }
+  },[]);
+  const handleTouchEnd=useCallback(()=>{touchRef.current=null},[]);
+
   const handleMouseDown=e=>{if(!e.target.closest('.gnode'))setPanning({sx:e.clientX,sy:e.clientY,tx:transform.x,ty:transform.y})};
   const handleMouseMove=e=>{
     if(panning)setTransform(t=>({...t,x:panning.tx+e.clientX-panning.sx,y:panning.ty+e.clientY-panning.sy}));
@@ -311,7 +331,8 @@ function GraphApp({user,onLogout}){
 
       <div className="graph-full">
         <svg ref={svgRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove}
-             onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+             onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
+             onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
           <defs>
             <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
               <polygon points="0 0,8 3,0 6" fill="#3b4f7a" fillOpacity="0.6"/></marker>
