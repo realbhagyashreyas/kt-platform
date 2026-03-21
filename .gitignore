@@ -1,0 +1,4 @@
+node_modules/
+kt.db
+kt.db-shm
+kt.db-wal
