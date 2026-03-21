@@ -30,12 +30,14 @@ router.post('/', upload.single('file'), (req, res) => {
     } else if (entityType === 'programs') {
       for (const r of records) {
         if (!r.name) continue;
-        let appId = null;
-        if (r.application) { const a = db.prepare('SELECT id FROM applications WHERE name = ?').get(r.application); appId = a ? a.id : null; }
-        const result = db.prepare('INSERT OR IGNORE INTO programs (name, description, business_logic, application_id) VALUES (?, ?, ?, ?)')
-          .run(r.name, r.description || '', r.business_logic || '', appId);
+        const result = db.prepare('INSERT OR IGNORE INTO programs (name, description, business_logic) VALUES (?, ?, ?)')
+          .run(r.name, r.description || '', r.business_logic || '');
         if (result.changes > 0) {
           const pid = result.lastInsertRowid;
+          if (r.applications) for (const an of r.applications.split(';')) {
+            const a = db.prepare('SELECT id FROM applications WHERE name = ?').get(an.trim());
+            if (a) db.prepare('INSERT OR IGNORE INTO program_application_links (program_id, application_id) VALUES (?, ?)').run(pid, a.id);
+          }
           if (r.read_tables) for (const tn of r.read_tables.split(';')) {
             const t = db.prepare('SELECT id FROM db2_tables WHERE name = ?').get(tn.trim());
             if (t) db.prepare('INSERT OR IGNORE INTO program_table_links (program_id, table_id, direction) VALUES (?, ?, ?)').run(pid, t.id, 'READ');
