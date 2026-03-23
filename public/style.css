@@ -93,8 +93,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
   padding:14px 20px;background:linear-gradient(180deg,rgba(11,17,32,0.85) 0%,rgba(11,17,32,0) 100%)}
 
 /* Row 2: search + filters — centered below bar */
-.hud-nav{top:68px;left:20px;display:flex;align-items:center;gap:10px;
-  flex-wrap:wrap;justify-content:flex-start;max-width:calc(100vw - 40px)}
+.hud-nav{top:68px;left:20px;display:flex;flex-direction:column;gap:8px;
+  align-items:flex-start;max-width:calc(100vw - 40px)}
 
 .hud-search{position:relative;flex-shrink:0}
 .hud-search input{width:320px;padding:10px 16px 10px 40px;border-radius:14px;
