@@ -503,14 +503,14 @@ function GraphApp({user,onLogout}){
             </div>)}
           </div>}
         </div>
-        <div className="hud-filters">
+        {!searchQ.trim()&&<div className="hud-filters">
           {[['role','Roles'],['app','Apps'],['program','Programs'],['table','Tables']].map(([k,l])=>
             <button key={k} className={`fpill ${filters[k]?'active':'off'}`} onClick={()=>toggleFilter(k)}>
               <svg width="13" height="13" viewBox="0 0 24 24" style={{flexShrink:0}}>
                 <path d={ICONS[k]} fill={COLORS[k]}/></svg>{l}
             </button>
           )}
-        </div>
+        </div>}
       </div>
 
       {/* ── Zoom controls ── */}
