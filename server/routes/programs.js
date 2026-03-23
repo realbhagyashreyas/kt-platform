@@ -44,11 +44,11 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { name, description, business_logic, application_ids, linked_program_ids, read_tables, write_tables } = req.body;
+  const { name, description, business_logic, application_ids, linked_program_ids, read_tables, write_tables, program_type } = req.body;
   if (!name) return res.status(400).json({ error: 'Name is required' });
   try {
-    const result = db.prepare('INSERT INTO programs (name, description, business_logic) VALUES (?, ?, ?)')
-      .run(name, description || '', business_logic || '');
+    const result = db.prepare('INSERT INTO programs (name, description, business_logic, program_type) VALUES (?, ?, ?, ?)')
+      .run(name, description || '', business_logic || '', program_type || 'online');
     const pid = result.lastInsertRowid;
     const insA = db.prepare('INSERT OR IGNORE INTO program_application_links (program_id, application_id) VALUES (?, ?)');
     if (application_ids) for (const aid of application_ids) { if (aid) insA.run(pid, aid); }
@@ -64,9 +64,9 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-  const { name, description, business_logic, application_ids, linked_program_ids, read_tables, write_tables } = req.body;
-  db.prepare('UPDATE programs SET name=?, description=?, business_logic=? WHERE id=?')
-    .run(name, description, business_logic, req.params.id);
+  const { name, description, business_logic, application_ids, linked_program_ids, read_tables, write_tables, program_type } = req.body;
+  db.prepare('UPDATE programs SET name=?, description=?, business_logic=?, program_type=? WHERE id=?')
+    .run(name, description, business_logic, program_type || 'online', req.params.id);
   db.prepare('DELETE FROM program_application_links WHERE program_id = ?').run(req.params.id);
   const insA = db.prepare('INSERT OR IGNORE INTO program_application_links (program_id, application_id) VALUES (?, ?)');
   if (application_ids) for (const aid of application_ids) { if (aid) insA.run(req.params.id, aid); }

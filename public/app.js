@@ -648,7 +648,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
 
   const openCreate=(type)=>{
     if(type==='applications')setForm({name:'',description:''});
-    else if(type==='programs')setForm({name:'',description:'',business_logic:'',application_ids:[],linked_program_ids:[],read_tables:[],write_tables:[]});
+    else if(type==='programs')setForm({name:'',description:'',business_logic:'',program_type:'online',application_ids:[],linked_program_ids:[],read_tables:[],write_tables:[]});
     else if(type==='tables')setForm({name:'',description:'',application_id:''});
     else setForm({name:'',description:'',application_ids:[],program_ids:[]});
     setModal({action:'create',type});
@@ -656,7 +656,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
   const openEdit=(type,item)=>{
     if(type==='applications')setForm({id:item.id,name:item.name,description:item.description});
     else if(type==='programs')setForm({id:item.id,name:item.name,description:item.description,business_logic:item.business_logic,
-      application_ids:(item.applications||[]).map(a=>a.id),linked_program_ids:(item.linked_programs||[]).map(p=>p.id),read_tables:(item.read_tables||[]).map(t=>t.id),write_tables:(item.write_tables||[]).map(t=>t.id)});
+      program_type:item.program_type||'online',application_ids:(item.applications||[]).map(a=>a.id),linked_program_ids:(item.linked_programs||[]).map(p=>p.id),read_tables:(item.read_tables||[]).map(t=>t.id),write_tables:(item.write_tables||[]).map(t=>t.id)});
     else if(type==='tables')setForm({id:item.id,name:item.name,description:item.description,application_id:item.application_id||''});
     else setForm({id:item.id,name:item.name,description:item.description,
       application_ids:(item.applications||[]).map(a=>a.id),program_ids:(item.programs||[]).map(p=>p.id)});
@@ -737,6 +737,7 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
           <div className="fg"><label>Description</label><textarea value={form.description||''} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Business description…"/></div>
           {modal.type==='programs'&&<>
             <div className="fg"><label>Business Logic</label><textarea value={form.business_logic||''} onChange={e=>setForm({...form,business_logic:e.target.value})} placeholder="Explain in plain language…"/></div>
+            <div className="fg"><label>Program Type</label><select value={form.program_type||'online'} onChange={e=>setForm({...form,program_type:e.target.value})}><option value="online">Online</option><option value="batch">Batch</option></select></div>
             <div className="fg"><label>Applications</label><div className="check-list">{apps.map(a=><label key={a.id} className="check-item"><input type="checkbox" checked={(form.application_ids||[]).includes(a.id)} onChange={()=>toggleCheck('application_ids',a.id)}/><span>{a.name}</span></label>)}{apps.length===0&&<span className="check-empty">No applications available</span>}</div></div>
             <div className="fg"><label>Linked Programs</label><div className="check-list">{programs.filter(p=>p.id!==form.id).map(p=><label key={p.id} className="check-item"><input type="checkbox" checked={(form.linked_program_ids||[]).includes(p.id)} onChange={()=>toggleCheck('linked_program_ids',p.id)}/><span>{p.name}</span></label>)}{programs.length<=1&&<span className="check-empty">No other programs available</span>}</div></div>
             <div className="fg"><label>Reads from</label><div className="check-list">{tables.map(t=><label key={t.id} className="check-item"><input type="checkbox" checked={(form.read_tables||[]).includes(t.id)} onChange={()=>toggleCheck('read_tables',t.id)}/><span>{t.name}</span></label>)}{tables.length===0&&<span className="check-empty">No tables available</span>}</div></div>

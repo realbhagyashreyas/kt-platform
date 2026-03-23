@@ -18,6 +18,7 @@ db.exec(`
     name TEXT NOT NULL UNIQUE,
     description TEXT,
     business_logic TEXT,
+    program_type TEXT DEFAULT 'online' CHECK(program_type IN ('online','batch')),
     application_id INTEGER REFERENCES applications(id) ON DELETE SET NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
