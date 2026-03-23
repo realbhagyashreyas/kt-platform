@@ -98,6 +98,7 @@ function GraphApp({user,onLogout}){
   const[tables,setTables]=useState([]);
   const[roles,setRoles]=useState([]);
   const[scrollEdges,setScrollEdges]=useState({t:false,b:false,l:false,r:false});
+  const[tourStep,setTourStep]=useState(()=>localStorage.getItem('kt_tour_done')?-1:0);
   const isAssociate=user.user_type==='associate';
 
   const NW=180,NH=70;
@@ -585,6 +586,45 @@ function GraphApp({user,onLogout}){
 
       {isAssociate&&<ManagePanel open={manageOpen} onClose={()=>setManageOpen(false)}
         apps={apps} programs={programs} tables={tables} roles={roles} reload={reload}/>}
+
+      {/* ── Guided Tour ── */}
+      {tourStep>=0&&<GuidedTour step={tourStep} isAssociate={isAssociate}
+        onNext={()=>setTourStep(s=>s+1)}
+        onSkip={()=>{setTourStep(-1);localStorage.setItem('kt_tour_done','1')}}
+        onDone={()=>{setTourStep(-1);localStorage.setItem('kt_tour_done','1')}}/>}
+    </div>
+  );
+}
+
+// ─── Guided Tour ───
+function GuidedTour({step,isAssociate,onNext,onSkip,onDone}){
+  const steps=[
+    {title:'Welcome to KT Platform',desc:'This is your mainframe knowledge graph. Each node represents a business entity — roles, applications, programs, and DB2 tables — all connected to show how they relate.',icon:'⬡'},
+    {title:'Navigate the Graph',desc:'Scroll to zoom in/out (like Google Maps). Click and drag to pan around. Click any node to see its details and connections.',icon:'🔍'},
+    {title:'Search & Filter',desc:'Use the search box on the top-left to find any entity by name. Toggle the filter pills below to show/hide specific types.',icon:'⌕'},
+    {title:'Node Types',desc:'🟡 Roles — business roles like MCC, Planner\n🔵 Apps — applications like FEDS, AMS\n🟢 Programs — mainframe programs (online/batch)\n🟣 Tables — DB2 tables that store data',icon:'◆'},
+    {title:'Explore Connections',desc:'Click any node to see its detail panel on the right. It shows description, business logic, and all connected entities. Click a connected item to navigate to it.',icon:'🔗'},
+  ];
+  if(isAssociate)steps.push({title:'Manage Data',desc:'As an Associate, you can add, edit, and delete entities using the Manage button in the top-right. You can also bulk upload via CSV.',icon:'✏️'});
+  steps.push({title:'You\'re All Set',desc:'Start exploring the knowledge graph. Click on nodes, search for entities, and discover how everything connects. Happy learning!',icon:'🚀'});
+  if(step>=steps.length)return onDone(),null;
+  const s=steps[step];
+  return(
+    <div className="tour-overlay">
+      <div className="tour-card fade-in">
+        <div className="tour-icon">{s.icon}</div>
+        <h3>{s.title}</h3>
+        <p>{s.desc}</p>
+        <div className="tour-progress">
+          {steps.map((_,i)=><span key={i} className={`tour-dot ${i===step?'active':i<step?'done':''}`}/>)}
+        </div>
+        <div className="tour-actions">
+          <button className="btn btn-ghost btn-sm" onClick={onSkip}>Skip Tour</button>
+          <button className="btn btn-accent btn-sm" onClick={onNext}>
+            {step===steps.length-1?'Get Started':'Next'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -658,6 +698,19 @@ function ManagePanel({open,onClose,apps,programs,tables,roles,reload}){
   };
   const save=async()=>{
     if(!form.name?.trim())return alert('Name is required');
+    // Duplicate detection on create
+    if(modal.action==='create'){
+      const nameLC=form.name.trim().toLowerCase();
+      const dupes=entities.filter(e=>e.name.toLowerCase()===nameLC);
+      if(dupes.length>0)return alert(`Duplicate detected: "${dupes[0].name}" already exists.`);
+      // Fuzzy match warning
+      const similar=entities.filter(e=>{
+        const n=e.name.toLowerCase();
+        return n.includes(nameLC)||nameLC.includes(n)||(nameLC.length>3&&n.length>3&&
+          (n.startsWith(nameLC.slice(0,4))||nameLC.startsWith(n.slice(0,4))));
+      });
+      if(similar.length>0&&!confirm(`Similar name found: "${similar[0].name}". Continue anyway?`))return;
+    }
     const endpoint=tab==='applications'?'/applications':tab==='programs'?'/programs':tab==='tables'?'/tables':'/roles';
     const body={...form};if(body.application_id==='')body.application_id=null;
     if(modal.action==='create')await api(endpoint,{method:'POST',body});

@@ -418,3 +418,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
   .entity-card:hover{border-color:var(--border);background:rgba(99,145,255,0.04)}
   .dlist li:hover{background:rgba(99,145,255,0.04);border-color:transparent;color:var(--muted)}
 }
+
+/* ── Guided Tour ── */
+.tour-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center}
+.tour-card{background:var(--surface-card);border:1px solid var(--border-bright);border-radius:24px;
+  padding:36px 40px;max-width:440px;width:90%;text-align:center;
+  box-shadow:0 0 100px rgba(99,102,241,0.12),0 30px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05)}
+.tour-icon{font-size:40px;margin-bottom:16px}
+.tour-card h3{font-size:20px;font-weight:700;margin-bottom:10px;
+  background:linear-gradient(135deg,var(--accent-bright),var(--accent));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tour-card p{font-size:13px;color:var(--text-secondary);line-height:1.8;white-space:pre-line;margin-bottom:20px}
+.tour-progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.tour-dot.active{background:var(--accent);width:24px;border-radius:4px}
+.tour-dot.done{background:var(--accent-bright)}
+.tour-actions{display:flex;gap:10px;justify-content:center}
