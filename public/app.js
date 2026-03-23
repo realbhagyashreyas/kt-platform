@@ -651,6 +651,15 @@ function DetailPanel({data,onClose,openDetail}){
         </div>
       </div>
       <div className="dsection"><h4>Description</h4><p>{e.description||'No description available.'}</p></div>
+      {e.program_type&&<div className="dsection"><h4>Program Type</h4>
+        <p style={{display:'flex',alignItems:'center',gap:8}}>
+          <span style={{padding:'3px 10px',borderRadius:6,fontSize:11,fontWeight:700,letterSpacing:'0.5px',
+            background:e.program_type==='batch'?'rgba(245,158,11,0.12)':'rgba(16,185,129,0.12)',
+            color:e.program_type==='batch'?'#f59e0b':'#10b981',
+            border:`1px solid ${e.program_type==='batch'?'rgba(245,158,11,0.25)':'rgba(16,185,129,0.25)'}`}}>
+            {e.program_type==='batch'?'⏱ Batch Program':'⚡ Online Program'}
+          </span>
+        </p></div>}
       {e.business_logic&&<div className="dsection"><h4>Business Logic</h4>
         <p style={{color:'var(--accent-bright)',fontStyle:'italic',background:'rgba(99,102,241,0.06)',
           padding:10,borderRadius:8,border:'1px solid var(--border)',fontSize:12}}>{e.business_logic}</p></div>}
