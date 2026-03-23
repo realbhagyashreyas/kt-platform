@@ -163,17 +163,14 @@ function GraphApp({user,onLogout}){
 
   useEffect(()=>{reload()},[reload]);
 
-  // Auto-fit on load
+  // Start zoomed in on center — user pans/zooms to explore like Google Maps
   useEffect(()=>{
     if(graphData.nodes.length>0&&transform.x===0&&transform.y===0&&transform.k===1){
       const xs=graphData.nodes.map(n=>n.x),ys=graphData.nodes.map(n=>n.y);
-      const pad=NW*1.5;
-      const minX=Math.min(...xs)-pad,maxX=Math.max(...xs)+pad;
-      const minY=Math.min(...ys)-pad,maxY=Math.max(...ys)+pad;
-      const gw=maxX-minX,gh=maxY-minY;
+      const cx2=(Math.min(...xs)+Math.max(...xs))/2;
+      const cy2=(Math.min(...ys)+Math.max(...ys))/2;
       const sw=window.innerWidth,sh=window.innerHeight;
-      const scale=Math.min(sw/gw,sh/gh,1)*0.82;
-      const cx2=(minX+maxX)/2,cy2=(minY+maxY)/2;
+      const scale=0.85; // zoomed in — shows a focused area, not everything
       const newT={x:sw/2-cx2*scale,y:sh/2-cy2*scale,k:scale};
       setTransform(newT);
       updateScrollEdges(newT,graphData.nodes);
@@ -225,26 +222,23 @@ function GraphApp({user,onLogout}){
     if(node)selectNode(node);
   };
 
-  // Scroll = Pan in all directions, Ctrl+Scroll = Zoom
+  // Scroll = Zoom (like Google Maps), Shift+Scroll = Pan horizontally
   const handleWheel=useCallback(e=>{
     e.preventDefault();
-    if(e.ctrlKey||e.metaKey){
+    if(e.shiftKey){
+      // Shift+scroll = horizontal pan
+      setTransform(t=>({...t, x:t.x - e.deltaY}));
+    }else if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){
+      // Trackpad horizontal swipe = pan
+      setTransform(t=>({...t, x:t.x - e.deltaX}));
+    }else{
+      // Normal scroll = zoom at cursor position
       const d=e.deltaY>0?0.92:1.08;
       const rect=svgRef.current.getBoundingClientRect();
       const mx=e.clientX-rect.left,my=e.clientY-rect.top;
       setTransform(t=>{
         const nk=Math.max(0.1,Math.min(4,t.k*d));
-        const newT={x:mx-(mx-t.x)*(nk/t.k),y:my-(my-t.y)*(nk/t.k),k:nk};
-        return newT;
-      });
-    }else{
-      // Pan: deltaY = vertical, deltaX = horizontal. Shift+scroll = horizontal pan
-      setTransform(t=>{
-        const newT={...t,
-          x:t.x - e.deltaX - (e.shiftKey?e.deltaY:0),
-          y:t.y - (e.shiftKey?0:e.deltaY)
-        };
-        return newT;
+        return{x:mx-(mx-t.x)*(nk/t.k),y:my-(my-t.y)*(nk/t.k),k:nk};
       });
     }
   },[]);
@@ -560,7 +554,7 @@ function GraphApp({user,onLogout}){
             </div>
           </div>
           <div style={{marginTop:5,paddingTop:5,borderTop:'1px solid var(--border)',fontSize:9.5,color:'var(--dim)'}}>
-            Scroll ↕↔ pan · Ctrl+Scroll zoom
+            Scroll zoom · Drag pan
           </div>
           {selected&&<div style={{marginTop:3}}>
             <span style={{fontSize:10,color:'var(--accent-bright)',cursor:'pointer',fontWeight:600}}
